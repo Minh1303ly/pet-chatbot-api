@@ -59,9 +59,13 @@ function detectIntent(userInput, context = []) {
   for (const intent of trainingData.intents) {
     if (intent.intent === 'inquire_product') continue;
     for (const pattern of intent.examples || []) {
+      if (typeof pattern !== 'string') {
+        console.warn(`Invalid pattern in intent ${intent.intent}: ${pattern}`);
+        continue;
+      }
       const patternNormalized = normalize(pattern.toLowerCase().trim());
-      const patternKeywords = new Set(patternNormalized.split(' '));
-      if (patternKeywords.some(k => combinedInput.includes(k)) &&
+      const patternKeywords = Array.from(new Set(patternNormalized.split(' ').filter(k => k)));
+      if (patternKeywords.length > 0 && patternKeywords.some(k => combinedInput.includes(k)) &&
           !(productKeywords.some(k => combinedInput.includes(k)) && clothingKeywords.some(k => combinedInput.includes(k)))) {
         console.log(`Matched intent: ${intent.intent} with pattern: '${pattern}'`);
         const { priceMax, color, category, petType, size, material, location } = extractQueryInfo(userInput);
