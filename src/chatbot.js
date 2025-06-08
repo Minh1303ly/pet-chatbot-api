@@ -5,7 +5,7 @@ const { normalize } = require('./utils');
 let trainingData = { intents: [], products: [] };
 async function loadTrainingData() {
   try {
-    const data = await fs.readFile('chatbot_training_data.json', 'utf-8');
+    const data = await fs.readFile(__dirname + '/../chatbot_training_data.json', 'utf-8');
     trainingData = JSON.parse(data);
     if (!Array.isArray(trainingData.intents)) {
       throw new Error("JSON file must contain an 'intents' list");
@@ -13,6 +13,17 @@ async function loadTrainingData() {
     console.log('JSON file loaded successfully.');
   } catch (error) {
     console.error(`Error loading JSON: ${error}`);
+    trainingData = {
+      intents: [
+        {
+          intent: "inquire_product",
+          examples: ["có áo cho chó không", "tìm váy cho mèo"],
+          responses: ["Dạ, shop có {clothing_type} cho {pet_type} size {size} màu {color} nha! 😊"]
+        }
+      ],
+      products: []
+    };
+    console.warn('Using fallback training data.');
   }
 }
 loadTrainingData();
